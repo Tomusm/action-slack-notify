@@ -10,10 +10,6 @@ async function run() {
     const slack_channel_id: string = core.getInput('slack_channel_id', { required: true });
     const slack_bot_token: string = core.getInput('slack_bot_token', { required: true });
 
-    const branch: string = github_context.ref.slice(11);
-    const repositoryUrl = github_context.event.repository.url + "/";
-    const commitUrl = github_context.event.head_commit.url + "/";
-
     const github = new GitHub(github_token);
 
     const jobs = await github.actions.listJobsForWorkflowRun({
@@ -40,34 +36,9 @@ async function run() {
           {
             type: "mrkdwn",
             text: "*Status:* " + (failed_job_links === '' ? 'Success' : 'Failure')
-          },
-          {
-            type: "mrkdwn",
-            text: "*Workflow:* <" + commitUrl + "checks|" + github_context.workflow + ">"
           }
         ]
-      },
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: "*Branch:* <" + repositoryUrl + "tree/" + branch + "|" + branch + ">"
-        }
-      },
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: "*Commit Message:* <" + commitUrl + '|' + github_context.event.head_commit.message + ">"
-        }
-      },
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: "*Commit ID:* " + github_context.event.head_commit.id
-        }
-      },
+      }
     ];
 
     if (failed_job_links !== '') {
